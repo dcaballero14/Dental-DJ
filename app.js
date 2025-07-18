@@ -4,20 +4,25 @@ const axios = require('axios');
 const session = require('express-session');
 const app = express();
 
-// Spotify credentials
-const clientId = 'a10269c181e742ad940a2a76efee3ca1';  // Make sure this is correct
-const clientSecret = '64e60604c70041afa0793f940f4311f3';  // Ensure this is correct
-const redirectUri = 'http://localhost:10000/callback';  // Ensure this matches your Spotify app settings
+// 1. **Replace this with your actual Spotify Client ID**
+const clientId = 'a10269c181e742ad940a2a76efee3ca1';  // Replace with your actual Spotify Client ID
+// 2. **Replace this with your actual Spotify Client Secret**
+const clientSecret = '64e60604c70041afa0793f940f4311f3';  // Replace with your actual Spotify Client Secret
+// 3. **Ensure the redirect URI matches exactly with what's in your Spotify Developer Dashboard**
+const redirectUri = 'https://dental-dj.onrender.com/callback';  // Update if your redirect URI is different (use HTTPS for production)
+
+// 4. **Define the port variable (use environment variable for production or fallback to 10000)**
+const port = process.env.PORT || 10000;  // Ensure this is correctly set
 
 // Middleware for session handling
 app.use(session({
-  secret: 'your-secret-key',
+  secret: 'your-secret-key',  // Keep this secret safe for production
   resave: false,
   saveUninitialized: true
 }));
 
 // Middleware to parse form data
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); // To parse form data from POST requests
 
 // Serve static files from 'public' folder (e.g., CSS, images, JS)
 app.use(express.static('public'));
@@ -33,6 +38,7 @@ app.get('/', (req, res) => {
 
 // Route to serve the login page (login.html)
 app.get('/login', (req, res) => {
+  // The authorization URL with your Spotify credentials
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=user-read-playback-state user-read-currently-playing`;
   res.redirect(authUrl);
 });
@@ -122,6 +128,12 @@ app.get('/add_to_queue', async (req, res) => {
     console.error('Error adding track to queue', error);
     res.status(500).send('Failed to add track to queue');
   }
+});
+
+// Error handling middleware (catch any unhandled routes)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!');
 });
 
 // Start the server on the correct port
