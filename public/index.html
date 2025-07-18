@@ -74,18 +74,51 @@
             border-radius: 10px;
             max-width: 400px;
         }
+
+        #status-message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #00ffcc;
+        }
+
+        .toggle-switch {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
     </style>
 </head>
 <body>
+    <div class="toggle-switch" onclick="toggleDarkMode()">Toggle Dark Mode</div>
     <header>
         Dental DJ
     </header>
 
-    <div class="search-section">
-        <h3>Search for a Song</h3>
-        <input type="text" id="search-box" placeholder="Enter song name...">
-        <button id="search-btn">Search</button>
-        <div id="search-results"></div>
+    <div class="container">
+        <div class="now-playing">
+            <h3>Now Playing</h3>
+            <h1 id="track-name">Loading...</h1>
+            <h2 id="artist-name"></h2>
+            <img id="album-art" src="" alt="Album Art" class="album-art">
+        </div>
+
+        <div class="search-section">
+            <h3>Search for a Song</h3>
+            <input type="text" id="search-box" placeholder="Enter song name...">
+            <button id="search-btn">Search</button>
+            <div id="search-results"></div>
+        </div>
+        <div id="status-message"></div>
     </div>
 
     <script>
@@ -103,6 +136,7 @@
         const params = getHashParams();
         let accessToken = params.access_token;
 
+        // If no access token, redirect to login
         if (!accessToken) {
             window.location.href = '/login';  // Redirect to login if no access token
         }
@@ -148,10 +182,14 @@
             setTimeout(() => document.getElementById('status-message').innerText = '', 3000);
         }
 
+        // Toggle Dark Mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
         // Call fetchNowPlaying periodically to update the interface every 5 seconds
         setInterval(fetchNowPlaying, 5000);
         fetchNowPlaying();  // Initial fetch on load
     </script>
 </body>
 </html>
-
