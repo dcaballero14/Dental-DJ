@@ -4,7 +4,7 @@ const axios = require('axios');
 const session = require('express-session');
 const app = express();
 
-// Spotify credentials - **replace these values with your actual credentials**
+// Spotify credentials - Replace with your actual Spotify credentials
 const clientId = 'a10269c181e742ad940a2a76efee3ca1';  // Replace with your actual Spotify Client ID
 const clientSecret = '64e60604c70041afa0793f940f4311f3';  // Replace with your actual Spotify Client Secret
 const redirectUri = 'https://dental-dj.onrender.com/callback';  // Ensure this matches exactly
@@ -137,5 +137,3 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`✅ Server running at http://127.0.0.1:${port}`);
 });
-
-
