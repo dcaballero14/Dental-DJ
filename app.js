@@ -3,12 +3,11 @@ const path = require('path');
 const axios = require('axios');
 const session = require('express-session');
 const app = express();
-const port = process.env.PORT || 10000;
 
 // Spotify credentials
-const clientId = 'a10269c181e742ad940a2a76efee3ca1';
-const clientSecret = '64e60604c70041afa0793f940f4311f3';
-const redirectUri = 'http://localhost:10000/callback';  // Update to your redirect URI
+const clientId = 'a10269c181e742ad940a2a76efee3ca1';  // Make sure this is correct
+const clientSecret = '64e60604c70041afa0793f940f4311f3';  // Ensure this is correct
+const redirectUri = 'http://localhost:10000/callback';  // Ensure this matches your Spotify app settings
 
 // Middleware for session handling
 app.use(session({
@@ -18,7 +17,7 @@ app.use(session({
 }));
 
 // Middleware to parse form data
-app.use(express.urlencoded({ extended: true })); // To parse form data from POST requests
+app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from 'public' folder (e.g., CSS, images, JS)
 app.use(express.static('public'));
@@ -129,3 +128,4 @@ app.get('/add_to_queue', async (req, res) => {
 app.listen(port, () => {
   console.log(`✅ Server running at http://127.0.0.1:${port}`);
 });
+
