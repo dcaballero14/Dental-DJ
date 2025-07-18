@@ -4,15 +4,15 @@ const axios = require('axios');
 const session = require('express-session');
 const app = express();
 
-// 1. **Replace these with your actual Spotify credentials**
+// Spotify credentials - Replace with your actual Spotify credentials
 const clientId = 'a10269c181e742ad940a2a76efee3ca1';  // Replace with your actual Spotify Client ID
 const clientSecret = '64e60604c70041afa0793f940f4311f3';  // Replace with your actual Spotify Client Secret
 const redirectUri = 'https://dental-dj.onrender.com/callback';  // Ensure this matches exactly in Spotify Developer Dashboard
 
-// 2. **Define the port variable** (use environment variable for production or fallback to 10000)
+// Define the port variable (use environment variable for production or fallback to 10000)
 const port = process.env.PORT || 10000;
 
-// 3. **Middleware for session handling**
+// Middleware for session handling
 app.use(session({
   secret: 'your-secret-key',  // Keep this secret safe for production
   resave: false,
@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from 'public' folder (e.g., CSS, images, JS)
 app.use(express.static('public'));
 
-// 4. **Route to serve the homepage (index.html)**
+// Route to serve the homepage (index.html)
 app.get('/', (req, res) => {
   console.log('Session Access Token:', req.session.accessToken);  // Debugging: log the access token stored in session
   if (req.session.accessToken) {
@@ -35,16 +35,15 @@ app.get('/', (req, res) => {
   }
 });
 
-// 5. **Route to serve the login page (login.html)**
+// Route to serve the login page (login.html)
 app.get('/login', (req, res) => {
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=user-read-playback-state user-read-currently-playing`;
   res.redirect(authUrl);  // Redirect to Spotify for login
 });
 
-// 6. **Callback route after successful login with Spotify**
+// Callback route after successful login with Spotify
 app.get('/callback', async (req, res) => {
   const code = req.query.code;
-
   console.log('Received code:', code);  // Debugging: log the received code
 
   const tokenUrl = 'https://accounts.spotify.com/api/token';
@@ -56,8 +55,10 @@ app.get('/callback', async (req, res) => {
   try {
     const response = await axios.post(tokenUrl, body, { headers });
     const { access_token, refresh_token } = response.data;
-    req.session.accessToken = access_token;  // Store the access token in the session
-    req.session.refreshToken = refresh_token;  // Store the refresh token in the session
+    console.log('Access token received:', access_token);  // Debugging: log the access token
+
+    req.session.accessToken = access_token;  // Store the access token in session
+    req.session.refreshToken = refresh_token; // Store the refresh token in session
     res.redirect('/');  // Redirect to home page after successful login
   } catch (error) {
     console.error('Error fetching access token', error);
@@ -65,7 +66,7 @@ app.get('/callback', async (req, res) => {
   }
 });
 
-// 7. **/now_playing route - Get currently playing track**
+// /now_playing route - Get currently playing track
 app.get('/now_playing', async (req, res) => {
   const accessToken = req.session.accessToken;
 
@@ -94,7 +95,7 @@ app.get('/now_playing', async (req, res) => {
   }
 });
 
-// 8. **/search route - Search for a song**
+// /search route - Search for a song
 app.get('/search', async (req, res) => {
   const { query, accessToken } = req.query;
 
@@ -114,7 +115,7 @@ app.get('/search', async (req, res) => {
   }
 });
 
-// 9. **/add_to_queue route - Add a track to the queue**
+// /add_to_queue route - Add a track to the queue
 app.get('/add_to_queue', async (req, res) => {
   const { trackUri, accessToken } = req.query;
 
@@ -129,13 +130,13 @@ app.get('/add_to_queue', async (req, res) => {
   }
 });
 
-// 10. **Error handling middleware** (catch any unhandled routes)
+// Error handling middleware (catch any unhandled routes)
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something went wrong!');
 });
 
-// 11. **Start the server on the correct port**
+// Start the server on the correct port
 app.listen(port, () => {
   console.log(`✅ Server is running at http://127.0.0.1:${port}`);
 });
