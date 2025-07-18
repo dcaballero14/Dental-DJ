@@ -9,6 +9,8 @@ const clientId = 'a10269c181e742ad940a2a76efee3ca1';  // Replace with your actua
 const clientSecret = '64e60604c70041afa0793f940f4311f3';  // Replace with your actual Spotify Client Secret
 const redirectUri = 'https://dental-dj.onrender.com/callback';  // Ensure this matches exactly in Spotify Developer Dashboard
 
+
+// Define the port variable (use environment variable for production or fallback to 10000)
 const port = process.env.PORT || 10000;
 
 // Middleware for session handling
@@ -26,7 +28,6 @@ app.use(express.static('public'));
 
 // Route to serve the homepage (index.html)
 app.get('/', (req, res) => {
-  console.log('Session Access Token:', req.session.accessToken);  // Debugging: log the access token stored in session
   if (req.session.accessToken) {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));  // Serve the main interface if the access token is set
   } else {
@@ -43,18 +44,14 @@ app.get('/login', (req, res) => {
 // Callback route after successful login with Spotify
 app.get('/callback', async (req, res) => {
   const code = req.query.code;
-  console.log('Received code:', code);  // Debugging: log the received code
 
   const tokenUrl = 'https://accounts.spotify.com/api/token';
-  const headers = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
+  const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
   const body = `grant_type=authorization_code&code=${code}&redirect_uri=${redirectUri}&client_id=${clientId}&client_secret=${clientSecret}`;
 
   try {
     const response = await axios.post(tokenUrl, body, { headers });
     const { access_token, refresh_token } = response.data;
-    console.log('Access token received:', access_token);  // Debugging: log the access token
 
     req.session.accessToken = access_token;  // Store the access token in session
     req.session.refreshToken = refresh_token; // Store the refresh token in session
@@ -77,6 +74,7 @@ app.get('/now_playing', async (req, res) => {
     const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
+
     if (response.data && response.data.item) {
       const track = response.data.item;
       res.json({
@@ -101,11 +99,7 @@ app.get('/search', async (req, res) => {
   try {
     const response = await axios.get(`https://api.spotify.com/v1/search`, {
       headers: { 'Authorization': `Bearer ${accessToken}` },
-      params: {
-        q: query,
-        type: 'track',
-        limit: 5
-      }
+      params: { q: query, type: 'track', limit: 5 }
     });
     res.json(response.data.tracks.items);
   } catch (error) {
