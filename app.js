@@ -7,7 +7,7 @@ const app = express();
 // 1. **Replace these with your actual Spotify credentials**
 const clientId = 'a10269c181e742ad940a2a76efee3ca1';  // Replace with your actual Spotify Client ID
 const clientSecret = '64e60604c70041afa0793f940f4311f3';  // Replace with your actual Spotify Client Secret
-const redirectUri = 'hhttps://dental-dj.onrender.com/callback';  // Ensure this matches exactly in Spotify Developer Dashboard
+const redirectUri = 'https://dental-dj.onrender.com/callback';  // Ensure this matches exactly in Spotify Developer Dashboard
 
 // 2. **Define the port variable** (use environment variable for production or fallback to 10000)
 const port = process.env.PORT || 10000;
