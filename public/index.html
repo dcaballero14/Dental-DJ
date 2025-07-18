@@ -4,57 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dental DJ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Basic styling for the interface */
+        /* General styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            padding: 20px;
-        }
-
-        h1 {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #b6b4ff, #a4e1ff);  /* Gradient background */
+            color: white;
             text-align: center;
-            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.5s ease;
         }
-
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a1a, #3a0d63);  /* Dark mode background */
+        }
+        .toggle-switch {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        .toggle-switch:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+        }
         .search-section {
-            margin-top: 20px;
+            margin-top: 40px;
         }
-
-        .search-section input, .search-section button {
+        .search-section input {
             padding: 10px;
             font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            width: 60%;
+            max-width: 300px;
+            margin-bottom: 10px;
+            background-color: white;
+            color: #333;
+            text-align: center;
         }
-
+        .search-section input::placeholder {
+            color: #888;
+        }
+        .search-section button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #ff5f8c; /* Pink button */
+            color: white;
+            cursor: pointer;
+            margin-left: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .search-section button:hover {
+            background-color: #e04a75;
+        }
         #search-results {
             margin-top: 20px;
         }
-
         .search-item {
-            margin: 10px;
+            margin: 10px auto;
             padding: 10px;
-            background-color: #fff;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-
-        .search-item p {
-            margin: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            max-width: 400px;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to Dental DJ</h1>
-    
-    <div class="search-section">
-        <h2>Search for a Song</h2>
-        <input type="text" id="search-box" placeholder="Enter song name...">
-        <button id="search-btn">Search</button>
-        <div id="search-results"></div>
+    <div class="toggle-switch" onclick="toggleDarkMode()">Toggle Dark Mode</div>
+    <header>
+        <h1>Dental DJ</h1>
+    </header>
+    <div class="container">
+        <div class="now-playing">
+            <h3>Now Playing</h3>
+            <h1 id="track-name">Loading...</h1>
+            <h2 id="artist-name"></h2>
+            <img id="album-art" src="" alt="Album Art" class="album-art">
+        </div>
+
+        <div class="search-section">
+            <h3>Search for a Song</h3>
+            <input type="text" id="search-box" placeholder="Type a song name...">
+            <button id="search-btn">Search</button>
+            <div id="search-results"></div>
+        </div>
+        <div id="status-message"></div>
     </div>
 
     <script>
-        // Get access token from URL hash
         function getHashParams() {
             const hash = window.location.hash.substring(1);
             const params = {};
@@ -69,10 +127,25 @@
         let accessToken = params.access_token;
 
         if (!accessToken) {
-            window.location.href = '/login'; // Redirect to login if no access token is found
+            window.location.href = '/login';  // Redirect to login if no access token
         }
 
-        // Search button click handler
+        // Fetch Now Playing info
+        async function fetchNowPlaying() {
+            const res = await fetch(`/now_playing?accessToken=${accessToken}`);
+            const data = await res.json();
+            if (data.isPlaying) {
+                document.getElementById('track-name').innerText = data.name;
+                document.getElementById('artist-name').innerText = data.artist;
+                document.getElementById('album-art').src = data.albumArt;
+            } else {
+                document.getElementById('track-name').innerText = 'No music playing';
+                document.getElementById('artist-name').innerText = '';
+                document.getElementById('album-art').src = '';
+            }
+        }
+
+        // Search for a song
         document.getElementById('search-btn').addEventListener('click', async () => {
             const query = document.getElementById('search-box').value;
             if (!query) return;
@@ -94,10 +167,19 @@
         // Add song to queue
         async function addToQueue(trackUri) {
             await fetch(`/add_to_queue?trackUri=${trackUri}&accessToken=${accessToken}`);
-            alert('Song added to queue!');
+            document.getElementById('status-message').innerText = '✅ Song added to queue!';
+            setTimeout(() => document.getElementById('status-message').innerText = '', 3000);
         }
+
+        // Toggle Dark Mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Fetch Now Playing every 5 seconds
+        setInterval(fetchNowPlaying, 5000);
+        fetchNowPlaying();
     </script>
 </body>
 </html>
-
 
