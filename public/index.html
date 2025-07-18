@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental DJ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #b6b4ff, #a4e1ff);
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a1a, #3a0d63);
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+        }
+        header img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        .now-playing h3 {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        .now-playing h1 {
+            font-size: 34px;
+            font-weight: 600;
+            margin: 5px 0;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .now-playing h2 {
+            font-size: 20px;
+            font-weight: 300;
+            margin: 0;
+            opacity: 0.8;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .album-art {
+            margin-top: 20px;
+            max-width: 300px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            animation: fadeIn 1s ease-in-out;
+        }
+        .search-section {
+            margin-top: 40px;
+        }
+        .search-section input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            width: 60%;
+            max-width: 300px;
+            margin-bottom: 10px;
+            background-color: white;
+            color: #333;
+            text-align: center;
+        }
+        .search-section input::placeholder {
+            color: #888;
+        }
+        .search-section button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #ff5f8c; /* Pink search button */
+            color: white;
+            cursor: pointer;
+            margin-left: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .search-section button:hover {
+            background-color: #e04a75;
+        }
+        #search-results {
+            margin-top: 20px;
+        }
+        .search-item {
+            margin: 10px auto;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            max-width: 400px;
+        }
+        #status-message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #00ffcc;
+        }
+        .toggle-switch {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        .toggle-switch:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="toggle-switch" onclick="toggleDarkMode()">Toggle Dark Mode</div>
+    <header>
+        <h1>Dental DJ</h1>
+    </header>
+    <div class="container">
+        <div class="now-playing">
+            <h3>Now Playing</h3>
+            <h1 id="track-name">Loading...</h1>
+            <h2 id="artist-name"></h2>
+            <img id="album-art" src="" alt="Album Art" class="album-art">
+        </div>
+
+        <div class="search-section">
+            <h3>Search for a Song</h3>
+            <input type="text" id="search-box" placeholder="Type a song name...">
+            <button id="search-btn">Search</button>
+            <div id="search-results"></div>
+        </div>
+        <div id="status-message"></div>
+    </div>
+
+    <script>
+        function getHashParams() {
+            const hash = window.location.hash.substring(1);
+            const params = {};
+            hash.split('&').forEach(kv => {
+                const [key, val] = kv.split('=');
+                params[key] = decodeURIComponent(val);
+            });
+            return params;
+        }
+
+        const params = getHashParams();
+        let accessToken = params.access_token;
+
+        if (!accessToken) {
+            window.location.href = '/login';
+        }
+
+        async function fetchNowPlaying() {
+            const res = await fetch(`/now_playing?accessToken=${accessToken}`);
+            const data = await res.json();
+            if (data.isPlaying) {
+                document.getElementById('track-name').innerText = data.name;
+                document.getElementById('artist-name').innerText = data.artist;
+                document.getElementById('album-art').src = data.albumArt;
+            } else {
+                document.getElementById('track-name').innerText = 'No music playing';
+                document.getElementById('artist-name').innerText = '';
+                document.getElementById('album-art').src = '';
+            }
+        }
+
+        document.getElementById('search-btn').addEventListener('click', async () => {
+            const query = document.getElementById('search-box').value;
+            if (!query) return;
+            const res = await fetch(`/search?query=${encodeURIComponent(query)}&accessToken=${accessToken}`);
+            const results = await res.json();
+            const resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = '';
+            results.forEach(track => {
+                const div = document.createElement('div');
+                div.className = 'search-item';
+                div.innerHTML = `
+                    <p><strong>${track.name}</strong> - ${track.artists[0].name}</p>
+                    <button onclick="addToQueue('${track.uri}')">Add to Queue</button>
+                `;
+                resultsDiv.appendChild(div);
+            });
+        });
+
+        async function addToQueue(trackUri) {
+            await fetch(`/add_to_queue?trackUri=${trackUri}&accessToken=${accessToken}`);
+            document.getElementById('status-message').innerText = '✅ Song added to queue!';
+            document.getElementById('search-results').innerHTML = '';
+            document.getElementById('search-box').value = '';
+            setTimeout(() => document.getElementById('status-message').innerText = '', 3000);
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        setInterval(fetchNowPlaying, 5000);
+        fetchNowPlaying();
+    </script>
+</body>
+</html>
+
