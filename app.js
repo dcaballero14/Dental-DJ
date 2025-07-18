@@ -7,7 +7,7 @@ const port = process.env.PORT || 10000;
 
 // Spotify credentials
 const clientId = 'a10269c181e742ad940a2a76efee3ca1';
-const clientSecret = '64e60604c70041afa0793f940f4311f3;
+const clientSecret = '64e60604c70041afa0793f940f4311f3';
 const redirectUri = 'http://localhost:10000/callback';  // Update to your redirect URI
 
 // Middleware for session handling
