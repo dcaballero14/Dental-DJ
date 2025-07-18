@@ -4,15 +4,13 @@ const axios = require('axios');
 const session = require('express-session');
 const app = express();
 
-// 1. **Replace this with your actual Spotify Client ID**
+// Spotify credentials - **replace these values with your actual credentials**
 const clientId = 'a10269c181e742ad940a2a76efee3ca1';  // Replace with your actual Spotify Client ID
-// 2. **Replace this with your actual Spotify Client Secret**
 const clientSecret = '64e60604c70041afa0793f940f4311f3';  // Replace with your actual Spotify Client Secret
-// 3. **Ensure the redirect URI matches exactly with what's in your Spotify Developer Dashboard**
-const redirectUri = 'https://dental-dj.onrender.com/callback';  // Update if your redirect URI is different (use HTTPS for production)
+const redirectUri = 'https://dental-dj.onrender.com/callback';  // Ensure this matches exactly
 
-// 4. **Define the port variable (use environment variable for production or fallback to 10000)**
-const port = process.env.PORT || 10000;  // Ensure this is correctly set
+// Define the port variable (use environment variable for production or fallback to 10000)
+const port = process.env.PORT || 10000;
 
 // Middleware for session handling
 app.use(session({
@@ -22,7 +20,7 @@ app.use(session({
 }));
 
 // Middleware to parse form data
-app.use(express.urlencoded({ extended: true })); // To parse form data from POST requests
+app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from 'public' folder (e.g., CSS, images, JS)
 app.use(express.static('public'));
@@ -30,17 +28,16 @@ app.use(express.static('public'));
 // Route to serve the homepage (index.html)
 app.get('/', (req, res) => {
   if (req.session.accessToken) {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));  // Serve the main interface
   } else {
-    res.redirect('/login');
+    res.redirect('/login');  // Redirect to login if there's no access token in the session
   }
 });
 
 // Route to serve the login page (login.html)
 app.get('/login', (req, res) => {
-  // The authorization URL with your Spotify credentials
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=user-read-playback-state user-read-currently-playing`;
-  res.redirect(authUrl);
+  res.redirect(authUrl);  // Redirect to Spotify for login
 });
 
 // Callback route after successful login with Spotify
@@ -66,7 +63,7 @@ app.get('/callback', async (req, res) => {
   }
 });
 
-// /now_playing route
+// /now_playing route - Get currently playing track
 app.get('/now_playing', async (req, res) => {
   const accessToken = req.session.accessToken;
 
@@ -95,7 +92,7 @@ app.get('/now_playing', async (req, res) => {
   }
 });
 
-// /search route
+// /search route - Search for a song
 app.get('/search', async (req, res) => {
   const { query, accessToken } = req.query;
 
@@ -115,7 +112,7 @@ app.get('/search', async (req, res) => {
   }
 });
 
-// /add_to_queue route
+// /add_to_queue route - Add a track to the queue
 app.get('/add_to_queue', async (req, res) => {
   const { trackUri, accessToken } = req.query;
 
@@ -140,4 +137,5 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`✅ Server running at http://127.0.0.1:${port}`);
 });
+
 
