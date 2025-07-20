@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dental DJ</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="top-bar">
+    <button id="darkModeToggle">Toggle Dark Mode</button>
+  </div>
+
+  <div class="container">
+    <div class="now-playing">Now Playing</div>
+    <div class="song-title" id="song-title">Loading...</div>
+    <div class="artist" id="artist">Please wait</div>
+    <img class="album-cover" id="album-cover" src="" alt="Album Cover" />
+
+    <div class="queue-section">
+      <div class="queue-title">Queue</div>
+      <div class="queue-list" id="queue-list"></div>
+    </div>
+
+    <div class="search-section">
+      <input type="text" id="song-search" placeholder="Type a song name..." />
+      <div class="search-results" id="search-results"></div>
+    </div>
+  </div>
+
+  <div id="confirmation" class="confirmation">Song added to queue!</div>
+  <script src="script.js"></script>
+</body>
+</html>
