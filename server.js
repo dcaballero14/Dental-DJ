@@ -4,13 +4,13 @@ const querystring = require('querystring');
 const bodyParser = require('body-parser');
 const path = require('path');
 
-const CLIENT_ID = process.env.CLIENT_ID || 'a10269c181e742ad940a2a76efee3ca1';
-const CLIENT_SECRET = process.env.CLIENT_SECRET || '64e60604c70041afa0793f940f4311f3';
-const REDIRECT_URI = 'https://dental-dj.onrender.com/callback'; // Hardcoded for Render
+const CLIENT_ID = process.env.a10269c181e742ad940a2a76efee3ca1;
+const CLIENT_SECRET = process.env.64e60604c70041afa0793f940f4311f3;
+const REDIRECT_URI = process.env.https://dental-dj.onrender.com/callback || 'https://dental-dj.onrender.com/callback';
 
-const app = express();
-app.use(express.static(path.join(__dirname)));
-app.use(bodyParser.json());
+if (!CLIENT_ID || !CLIENT_SECRET) {
+  console.error("Missing SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET env vars.");
+}
 
 let access_token = '';
 let refresh_token = '';
